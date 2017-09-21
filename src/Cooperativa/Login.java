@@ -71,7 +71,7 @@ public class Login extends javax.swing.JFrame {
         });
 
         btn_conectar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btn_conectar.setText("CONECTAR");
+        btn_conectar.setText("INGRESAR");
         btn_conectar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_conectarActionPerformed(evt);

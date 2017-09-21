@@ -24,6 +24,7 @@ public class CrearEmpleado extends javax.swing.JFrame {
      */
     
     EstablecerConexion conexion;
+    CrearCuenta crearCuenta;
     
     public CrearEmpleado(EstablecerConexion conexion)
     {
@@ -50,7 +51,7 @@ public class CrearEmpleado extends javax.swing.JFrame {
             {
                 PreparedStatement preparedStatement = this.conexion.preparedStatement;
 
-                preparedStatement = this.conexion.connection.prepareStatement("exec SP_EMPLEADO_CREATE ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+                preparedStatement = this.conexion.connection.prepareStatement("exec SP_EMPLEADO_CREATE ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
                 preparedStatement.setString(1, text_pNombre.getText());
                 preparedStatement.setString(2, text_sNombre.getText());
                 preparedStatement.setString(3, text_pApellido.getText());
@@ -66,7 +67,9 @@ public class CrearEmpleado extends javax.swing.JFrame {
                 preparedStatement.setString(13, text_idUsuario.getText());
                 preparedStatement.setString(14, text_contraseña.getText());
                 preparedStatement.setString(15, (String)cmbox_tipoRol.getSelectedItem());
-                preparedStatement.setString(16, this.conexion.loggedUser);
+                preparedStatement.setDouble(16, crearCuenta.monto_ahorro);
+                preparedStatement.setDouble(17, crearCuenta.monto_aportacion);
+                preparedStatement.setString(18, this.conexion.loggedUser);
                 
                 JOptionPane.showOptionDialog(null, "Registro agregado exitosamente..!", "Notificación",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, "OK");
@@ -78,8 +81,6 @@ public class CrearEmpleado extends javax.swing.JFrame {
             }
             catch(SQLException | HeadlessException exception){}   
         }
-        
-       
     }
     
     
@@ -148,13 +149,14 @@ public class CrearEmpleado extends javax.swing.JFrame {
         btnCancelar = new javax.swing.JButton();
         btnSalir = new javax.swing.JButton();
         cmbox_tipoRol = new javax.swing.JComboBox<>();
+        btnAgregarCuenta = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CREAR EMPLEADO");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("REGISTRO EMPLEADOS");
+        jLabel1.setText("AGREGAR EMPLEADO");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Primer Apellido:");
@@ -268,12 +270,20 @@ public class CrearEmpleado extends javax.swing.JFrame {
         cmbox_tipoRol.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cmbox_tipoRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ADMINISTRADOR", "AFILIADO" }));
 
+        btnAgregarCuenta.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnAgregarCuenta.setText("AGREGAR CUENTA");
+        btnAgregarCuenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarCuentaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(36, 36, 36)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -335,12 +345,14 @@ public class CrearEmpleado extends javax.swing.JFrame {
                                 .addComponent(cmbox_tipoRol, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(text_contraseña, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
                         .addGap(4, 4, 4))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(108, 108, 108)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnAgregarCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(59, 59, 59)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(58, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -404,7 +416,8 @@ public class CrearEmpleado extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAgregarCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -420,15 +433,17 @@ public class CrearEmpleado extends javax.swing.JFrame {
     }//GEN-LAST:event_text_fechaContActionPerformed
 
     private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:   
         
         if(!validarCamposVacios())
         {
             JOptionPane.showOptionDialog(null, "Algunos campos estan vacios", "Notificación",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, "OK");
         }
-        else
-           agregarEmpleado();
+        else{            
+            agregarEmpleado();
+        }
+        
     }//GEN-LAST:event_btnCrearActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
@@ -440,6 +455,13 @@ public class CrearEmpleado extends javax.swing.JFrame {
         // TODO add your handling code here:
         dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnAgregarCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarCuentaActionPerformed
+        // TODO add your handling code here:
+        
+        crearCuenta = new CrearCuenta(conexion);
+        crearCuenta.setVisible(true);
+    }//GEN-LAST:event_btnAgregarCuentaActionPerformed
 
     void limpiarTextFields()
     {
@@ -497,6 +519,7 @@ public class CrearEmpleado extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregarCuenta;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnCrear;
     private javax.swing.JButton btnSalir;
