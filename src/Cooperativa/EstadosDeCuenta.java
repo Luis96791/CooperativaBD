@@ -5,6 +5,7 @@
  */
 package Cooperativa;
 
+import java.sql.SQLException;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -19,18 +20,13 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
      */
     
     EstablecerConexion conexion;
-    DefaultTableModel mt_aportaciones, mt_ahorro, mt_prestamos;
-    int autoincrmentables[] = {0,0,0};
+    DefaultTableModel mt_aportaciones, mt_ahorro, mt_prestamos, mt_ganancias;
+    int autoincrmentables[] = {0,0,0,0};
     
     public EstadosDeCuenta(EstablecerConexion conexion) {
         this.conexion = conexion;
         initComponents();
-        mt_aportaciones = (DefaultTableModel) tabla_aportaciones.getModel();
-        tabla_aportaciones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        mt_ahorro = (DefaultTableModel) tabla_ahorro.getModel();
-        tabla_ahorro.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        mt_prestamos = (DefaultTableModel) tabla_prestamos.getModel();
-        tabla_prestamos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        configuracionDeTablas();
     }
     
     public EstadosDeCuenta(){}
@@ -57,7 +53,7 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
             conexion.callableStatement.close();
             conexion.resultSet.close();
         }
-        catch(Exception e){}
+        catch(SQLException | NumberFormatException e){}
     }
     
     public void verAbonosAhorro()
@@ -82,7 +78,7 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
             conexion.callableStatement.close();
             conexion.resultSet.close();
         }
-        catch(Exception e){}
+        catch(SQLException | NumberFormatException e){}
     }
     
     public void verPagosPrestamo()
@@ -109,7 +105,45 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
             conexion.callableStatement.close();
             conexion.resultSet.close();
         }
-        catch(Exception e){}
+        catch(SQLException | NumberFormatException e){}
+    }
+    
+    public void verGanancias()
+    {
+        try
+        {
+            conexion.callableStatement = conexion.connection.prepareCall("SELECT * FROM FN_GANANCIAS_ANIO_ACTUAL(?,?)");
+            conexion.callableStatement.setString(1, conexion.loggedUser);
+            conexion.callableStatement.setInt(2, Integer.parseInt(text_anio.getText()));
+            conexion.resultSet = conexion.callableStatement.executeQuery();
+
+            while(conexion.resultSet.next())
+            {
+                mt_ganancias.addRow(new Object[]
+                {
+                    ++autoincrmentables[3],
+                    conexion.resultSet.getString("ID_GANANCIA"),
+                    conexion.resultSet.getString("FECHA_REGISTRO"),
+                    conexion.resultSet.getDouble("GANANCIA")
+                    
+                });
+            }
+            conexion.callableStatement.close();
+            conexion.resultSet.close();
+        }
+        catch(SQLException | NumberFormatException e){}
+    }
+    
+    public void configuracionDeTablas()
+    {
+        mt_aportaciones = (DefaultTableModel) tabla_aportaciones.getModel();
+        tabla_aportaciones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        mt_ahorro = (DefaultTableModel) tabla_ahorro.getModel();
+        tabla_ahorro.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        mt_prestamos = (DefaultTableModel) tabla_prestamos.getModel();
+        tabla_prestamos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        mt_ganancias = (DefaultTableModel) tabla_ganancias.getModel();
+        tabla_ganancias.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
     /**
@@ -129,6 +163,8 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
         tabla_aportaciones = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         tabla_prestamos = new javax.swing.JTable();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tabla_ganancias = new javax.swing.JTable();
         btnSalir = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         text_anio = new javax.swing.JTextField();
@@ -230,6 +266,32 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
 
         tabbed_cuentas.addTab("PRESTAMOS", jScrollPane3);
 
+        tabla_ganancias.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "", "ID GANANCIA", "FECHA REGISTRO", "GANANCIA"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(tabla_ganancias);
+        if (tabla_ganancias.getColumnModel().getColumnCount() > 0) {
+            tabla_ganancias.getColumnModel().getColumn(0).setPreferredWidth(40);
+            tabla_ganancias.getColumnModel().getColumn(1).setPreferredWidth(150);
+            tabla_ganancias.getColumnModel().getColumn(2).setPreferredWidth(150);
+            tabla_ganancias.getColumnModel().getColumn(3).setPreferredWidth(150);
+        }
+
+        tabbed_cuentas.addTab("GANANCIAS", jScrollPane4);
+
         btnSalir.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnSalir.setText("SALIR");
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -240,6 +302,8 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("AÑO:");
+
+        text_anio.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 
         btnVer.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnVer.setText("VER");
@@ -253,25 +317,25 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(66, 66, 66)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(52, 52, 52)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(text_anio, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(btnVer, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 24, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(tabbed_cuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(52, 52, 52)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tabbed_cuentas)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(text_anio, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(38, 38, 38)
+                                        .addComponent(btnVer, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 131, Short.MAX_VALUE)))))
                 .addGap(23, 23, 23))
         );
         layout.setVerticalGroup(
@@ -306,9 +370,16 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
 
     private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
         // TODO add your handling code here:}
-        verAbonosAportaciones();
-        verAbonosAhorro();
-        verPagosPrestamo();
+        if(this.tabla_aportaciones.getRowCount() == 0 && this.tabla_aportaciones.getSelectedRow() == -1
+           && this.tabla_ahorro.getRowCount() == 0 && this.tabla_ahorro.getSelectedRow() == -1
+           && this.tabla_prestamos.getRowCount() == 0 && this.tabla_prestamos.getSelectedRow() == -1
+           && this.tabla_ganancias.getRowCount() == 0 && this.tabla_ganancias.getSelectedRow() == -1
+        ){
+            verAbonosAportaciones();
+            verAbonosAhorro();
+            verPagosPrestamo();
+            verGanancias();
+        }
     }//GEN-LAST:event_btnVerActionPerformed
 
     /**
@@ -354,9 +425,11 @@ public final class EstadosDeCuenta extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane tabbed_cuentas;
     private javax.swing.JTable tabla_ahorro;
     private javax.swing.JTable tabla_aportaciones;
+    private javax.swing.JTable tabla_ganancias;
     private javax.swing.JTable tabla_prestamos;
     private javax.swing.JTextField text_anio;
     // End of variables declaration//GEN-END:variables

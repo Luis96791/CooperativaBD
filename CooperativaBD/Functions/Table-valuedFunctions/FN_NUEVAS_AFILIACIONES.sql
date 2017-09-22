@@ -1,0 +1,36 @@
+USE [CooperativaBD]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[FN_NUEVAS_AFILIACIONES]    Script Date: 22/09/2017 13:31:06 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE FUNCTION [dbo].[FN_NUEVAS_AFILIACIONES] 
+(	
+	-- Add the parameters for the function here
+	@FILTRO INT
+)
+RETURNS TABLE 
+AS
+RETURN 
+(
+	-- Add the SELECT statement with parameter references here
+	SELECT e.CODIGO_EMPLEADO, e.PRIMER_NOMBRE + ' ' + e.SEGUNDO_NOMBRE + ' ' + e.PRIMER_APELLIDO AS NOMBRES, e.FECHA_CONTRATACION, 
+		SUM(CASE WHEN c.TIPO_CUENTA = 'APORTACION' THEN c.SALDO_CUENTA ELSE NULL END) AS APORTACIONES, SUM(CASE WHEN c.TIPO_CUENTA = 'AHORRO' THEN c.SALDO_CUENTA ELSE NULL END) 
+		AS AHORRO, SUM((CASE WHEN c.TIPO_CUENTA = 'APORTACION' THEN c.SALDO_CUENTA ELSE 0 END) + (CASE WHEN c.TIPO_CUENTA = 'AHORRO' THEN c.SALDO_CUENTA ELSE 0 END)) AS TOTAL
+	FROM  EMPLEADO e INNER JOIN
+        CUENTA c ON e.CODIGO_EMPLEADO = c.CODIGO_EMPLEADO
+		WHERE e.FECHA_CONTRATACION BETWEEN CAST(@FILTRO AS nvarchar)+'0101' AND CAST(@FILTRO AS nvarchar)+'1231'
+		GROUP BY e.CODIGO_EMPLEADO, e.PRIMER_NOMBRE + ' ' + e.SEGUNDO_NOMBRE + ' ' + e.PRIMER_APELLIDO, e.FECHA_CONTRATACION
+)
+GO
+
+

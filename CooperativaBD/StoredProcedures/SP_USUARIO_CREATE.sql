@@ -1,0 +1,54 @@
+USE [CooperativaBD]
+GO
+
+/****** Object:  StoredProcedure [dbo].[SP_USUARIO_CREATE]    Script Date: 22/09/2017 13:39:43 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[SP_USUARIO_CREATE]
+(
+	@ID_USUARIO NVARCHAR(20), @CODIGO_EMPLEADO BIGINT,
+	@CONTRASEÑA NVARCHAR(20), @TIPO_ROL NVARCHAR(20), @CREADO_POR NVARCHAR(50)
+)
+AS
+	DECLARE 
+		@FECHA_CREACION DATETIME,
+		@FECHA_MODIF DATETIME,
+		@VAR_CODIGO_EMPLEADO BIGINT,
+		@VAR_ID_ROL NVARCHAR(20)
+
+	
+	SET @FECHA_CREACION = GETDATE()
+	SET @FECHA_MODIF = GETDATE()
+	SET @VAR_CODIGO_EMPLEADO = (SELECT CODIGO_EMPLEADO
+							FROM DBO.EMPLEADO
+							WHERE CODIGO_EMPLEADO = @CODIGO_EMPLEADO)
+
+	SET @VAR_ID_ROL = cast((SELECT ID_ROL
+					FROM DBO.ROL
+					WHERE @TIPO_ROL = TIPO_ROL)as nvarchar)
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	IF @VAR_CODIGO_EMPLEADO IS NOT NULL
+	BEGIN 
+		INSERT INTO USUARIO(ID_USUARIO, CODIGO_EMPLEADO, CONTRASEÑA, ID_ROL, FECHA_CREACION,
+		FECHA_MODIF, CREADO_POR, MODIFICADO_POR)
+		VALUES (@ID_USUARIO, @CODIGO_EMPLEADO, @CONTRASEÑA, @VAR_ID_ROL, @FECHA_CREACION, @FECHA_MODIF,
+		@CREADO_POR, NULL) 
+	END
+END
+GO
+
+

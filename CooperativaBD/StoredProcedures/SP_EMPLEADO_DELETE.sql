@@ -1,0 +1,44 @@
+USE [CooperativaBD]
+GO
+
+/****** Object:  StoredProcedure [dbo].[SP_EMPLEADO_DELETE]    Script Date: 22/09/2017 13:36:00 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[SP_EMPLEADO_DELETE] 
+	-- Add the parameters for the stored procedure here
+	@CODIGO_EMPLEADO BIGINT
+AS
+	DECLARE
+		@VAR_ID_USUARIO NVARCHAR(20),
+		@VAR_NUMERO_CUENTA1 NVARCHAR(20),
+		@VAR_NUMERO_CUENTA2 NVARCHAR(20)
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	SET @VAR_ID_USUARIO = (SELECT ID_USUARIO FROM USUARIO WHERE CODIGO_EMPLEADO = @CODIGO_EMPLEADO)
+	SET @VAR_NUMERO_CUENTA1 = (SELECT NUMERO_CUENTA FROM CUENTA WHERE CODIGO_EMPLEADO = @CODIGO_EMPLEADO AND TIPO_CUENTA = 'APORTACION')
+	SET @VAR_NUMERO_CUENTA1 = (SELECT NUMERO_CUENTA FROM CUENTA WHERE CODIGO_EMPLEADO = @CODIGO_EMPLEADO AND TIPO_CUENTA = 'AHORRO')
+
+    -- Insert statements for procedure here
+	DELETE FROM dbo.EMPLEADO
+	WHERE @CODIGO_EMPLEADO = CODIGO_EMPLEADO
+
+	EXEC SP_USUARIO_DELETE @VAR_ID_USUARIO
+	EXEC SP_CUENTA_DELETE @VAR_NUMERO_CUENTA1
+	EXEC SP_CUENTA_DELETE @VAR_NUMERO_CUENTA2
+
+END
+GO
+
+

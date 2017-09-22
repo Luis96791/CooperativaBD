@@ -35,8 +35,8 @@ public class EstablecerConexion {
     public boolean abrirSesion(String id_usuario, String contrasena)
     {
         //Los valores de Estos campos son temporales
-        //id_usuario = "admin";
-        //contrasena = "1626";
+        id_usuario = "user6";
+        contrasena = "16261995";
         String QUERY = "SELECT * FROM USUARIO";
         
         try
