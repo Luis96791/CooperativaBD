@@ -5,6 +5,8 @@
  */
 package Cooperativa;
 
+import java.awt.HeadlessException;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -93,7 +95,7 @@ public class ModificarEmpleado extends javax.swing.JFrame {
             
             JOptionPane.showOptionDialog(null, "Registro modificado exitosamente..!", "Notificación",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, "OK");
-        }catch(Exception e){}
+        }catch(SQLException | HeadlessException e){}
     }
 
     /**

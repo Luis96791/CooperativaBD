@@ -27,8 +27,6 @@ public class VerCuenta extends javax.swing.JFrame {
     public VerCuenta(EstablecerConexion conexion, int codigo_empleado) {
         this.conexion = conexion;
         this.codigo_empleado = codigo_empleado;
-//        text_codigo_empleado.setText(Integer.toString(codigo_empleado));
-//        text_codigo_empleado.setEnabled(true);
         initComponents();
         actionsTextCodigoEmpleado();
     }    
